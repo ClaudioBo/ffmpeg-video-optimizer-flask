@@ -1,5 +1,6 @@
 import os
 import time
+import shutil
 from pathlib import Path
 from queue import Queue
 from threading import Thread
@@ -7,9 +8,11 @@ from concurrent.futures import ThreadPoolExecutor
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 
+from app.events import notify_disk
 from core.config import WATCH_DIR
 from core.ffmpeg import process_video
 from core.utils import is_video_file
+from core.singletons import video_being_processed
 
 task_queue = Queue()
 executor = ThreadPoolExecutor(max_workers=int(os.getenv("FFMPEG_WORKERS")))
@@ -22,7 +25,7 @@ class VideoHandler(FileSystemEventHandler):
             if is_video_file(path):
                 task_queue.put(path)
 
-def start_worker():
+def start_video_worker():
     """Inicia el worker que toma archivos de la cola y lanza tareas en el executor."""
     def worker_loop():
         while True:
@@ -31,6 +34,24 @@ def start_worker():
                 break
             executor.submit(process_video, path)
             time.sleep(0.1)
+
+    thread = Thread(target=worker_loop, daemon=True)
+    thread.start()
+    return thread
+
+def start_disk_worker():
+    """Inicia el worker que envia constantemente por SSE el espacio usado en disco."""
+    def worker_loop():
+        path = WATCH_DIR.resolve()
+        while not os.path.ismount(path):
+            path = path.parent
+        mount_point = path
+        while True:
+            time.sleep(1)
+            if len(video_being_processed) == 0:
+                continue
+            total, used, _ = shutil.disk_usage(mount_point)
+            notify_disk(used, total)
 
     thread = Thread(target=worker_loop, daemon=True)
     thread.start()

@@ -6,9 +6,9 @@ def update_progress(filename, progress):
     """Actualiza el progreso de un archivo en proceso."""
     with video_being_processed_lock:
         video_being_processed[filename] = progress
-    notify_clients()
+    notify_progress()
 
-def notify_clients():
+def notify_progress():
     """Envía el estado actual a todos los clientes conectados por SSE."""
     with video_being_processed_lock:
         payload = json.dumps({
@@ -22,9 +22,15 @@ def notify_clients():
     for q in sse_clients:
         q.put(payload)
 
-def send_reload():
+def notifY_reload():
     """Notifica a los clientes que deben recargar la interfaz."""
     payload = json.dumps({"type": "reload"})
+    for q in sse_clients:
+        q.put(payload)
+
+def notify_disk(used, total):
+    """Notifica a los clientes el uso del disco."""
+    payload = json.dumps({"type": "disk", "used": used, "total": total})
     for q in sse_clients:
         q.put(payload)
 

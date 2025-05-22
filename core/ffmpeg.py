@@ -7,7 +7,7 @@ from pathlib import Path
 
 from .config import OUTPUT_DIR, WATCH_DIR
 from .database import log_optimization
-from app.events import update_progress, send_reload, notify_clients
+from app.events import update_progress, notifY_reload, notify_progress
 
 from .singletons import video_being_processed, video_being_processed_lock
 
@@ -48,7 +48,7 @@ def process_video(input_path: Path):
         video_being_processed[input_path.name] = 0
 
     try:
-        notify_clients()
+        notify_progress()
         output_path, failed_path, rel_path = get_output_paths(input_path)
         tmp_output_path = output_path.with_suffix(output_path.suffix + ".tmp")
         output_path.parent.mkdir(parents=True, exist_ok=True)
@@ -163,4 +163,4 @@ def process_video(input_path: Path):
     finally:
         with video_being_processed_lock:
             video_being_processed.pop(input_path.name, None)
-        send_reload()
+        notifY_reload()

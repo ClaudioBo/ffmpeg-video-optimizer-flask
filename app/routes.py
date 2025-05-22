@@ -1,7 +1,10 @@
 import json
+import os
 from queue import Queue
+import shutil
 from flask import Blueprint, render_template, redirect, url_for, Response
 
+from core.config import WATCH_DIR
 from core.database import clear_optimizations, get_optimizations
 from core.utils import get_color, human_readable_size
 from core.watcher import queue_all_videos
@@ -75,6 +78,14 @@ def sse():
                 ]
             })
         yield f"data: {initial_payload}\n\n"
+
+        path = WATCH_DIR.resolve()
+        while not os.path.ismount(path):
+            path = path.parent
+        mount_point = path
+        total, used, _ = shutil.disk_usage(mount_point)
+        usage_json = json.dumps({"type": "disk", "used": used, "total": total})
+        yield f"data: {usage_json}\n\n"
 
         try:
             while True:
