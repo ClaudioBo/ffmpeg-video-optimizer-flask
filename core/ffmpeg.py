@@ -128,7 +128,10 @@ def process_video(input_path: Path):
                 log_optimization(rel_path, orig_size, out_size, failed=0)
                 print(f"Optimización exitosa: {final_output_path.relative_to(OUTPUT_DIR)}")
 
-            except subprocess.CalledProcessError:
+            except subprocess.CalledProcessError as e:
+                if e.returncode == 255: 
+                    exit(0)
+                    return
                 print(f"Error al procesar: {rel_path}")
                 stderr_output = stderr_buffer.getvalue()
                 last_lines = stderr_output.strip().split('\n')[-20:]
