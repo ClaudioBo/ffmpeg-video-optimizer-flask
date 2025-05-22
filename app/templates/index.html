@@ -18,7 +18,7 @@
         <button type="submit" class="btn btn-danger">Eliminar estadísticas</button>
       </form>
     </div>
-    <table class="table table-bordered table-striped">
+    <table class="table table-bordered table-striped sortable">
       <thead class="table-dark">
         <tr>
           <th>Archivo</th>
@@ -37,13 +37,13 @@
         {% for row in data %}
         <tr>
           <td>{{ row[0] }}</td> {# nombre de archivo #}
-          <td>{{ row[1] }}</td> {# tamaño original #}
-          <td>{{ row[2] }}</td> {# tamaño optimizado #}
-          {% if row[4] %}
-          <td style="background-color: #dc3545; color: white; font-weight:bold;">Falló</td>
+          <td data-sort="{{ row[2] }}">{{ row[1] }}</td> {# tamaño original #}
+          <td data-sort="{{ row[4] }}">{{ row[3] }}</td> {# tamaño optimizado #}
+          {% if row[6] %}
+          <td data-sort="0" style="background-color: #8f222d; color: white; font-weight:bold;">Falló</td>
           {% else %}
-          <td style="background-color: {{ row[5] }}; color: white; font-weight:bold;">
-            {{ row[3] }}%
+          <td data-sort="{{ row[8] }}" style="background-color: {{ row[7] }}; color: white; font-weight:bold;">
+            {{ row[5] }}%
           </td>
           {% endif %}
         </tr>
@@ -79,5 +79,7 @@
 </div>
 
 <script src="static/script.js"></script>
+<link href="https://cdn.jsdelivr.net/gh/tofsjonas/sortable@latest/dist/sortable.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/gh/tofsjonas/sortable@latest/dist/sortable.min.js"></script>
 
 </html>

@@ -29,10 +29,13 @@ def index():
         data_converted.append((
             filename,
             human_readable_size(orig_bytes),
+            orig_bytes,
             human_readable_size(opt_bytes),
+            opt_bytes,
             percent,
             failed,
-            color
+            color,
+            percent
         ))
 
     total_orig_str = human_readable_size(total_orig_bytes)
