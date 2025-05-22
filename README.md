@@ -3,7 +3,7 @@ Servicio que optimizará con FFMPEG videos con subidos en la ruta definida **`'W
 Este servicio lo hice para usarlo en un **contenedor LXC** en mi **Proxmox** configurandole a que exponga un directorio bajo Samba para poder subir ahi los archivos desde mi computadora Windows.  
 
 ## Requisitos
-- Hacer un contenedor LXC en Proxmox
+- [Hacer un contenedor LXC en Proxmox](docs/LXC.md)
 - [Hacerle passthrough](docs/PASSTHROUGH.md) de una iGPU de AMD Ryzen (ya que **`ffmpeg`** esta configurado que use **`vaapi`**) al **contenedor LXC**
 - Instalarle **`samba`** al contenedor LXC y [configurarlo](docs/SAMBA.md)
 - Instalarle **`ffmpeg`** al contenedor LXC
