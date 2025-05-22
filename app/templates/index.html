@@ -18,6 +18,13 @@
         <button type="submit" class="btn btn-danger">Eliminar estadísticas</button>
       </form>
     </div>
+
+    <div id="processing" class="mb-3">
+      <h5>Procesando actualmente:</h5>
+      <table id="processing-list" class="table table-bordered">
+      </table>
+    </div>
+
     <table class="table table-bordered table-striped sortable">
       <thead class="table-dark">
         <tr>
@@ -28,11 +35,6 @@
         </tr>
       </thead>
       <tbody>
-
-        <div id="processing" class="mb-3">
-          <h5>Procesando actualmente:</h5>
-          <ul id="processing-list" class="list-group"></ul>
-        </div>
 
         {% for row in data %}
         <tr>
@@ -64,19 +66,25 @@
   </div>
 </body>
 
-<div hidden>
-  <li id="item-processing-template" class="list-group-item d-flex align-items-center justify-content-between">
-    <div class="d-flex align-items-center gap-2">
-      <span class="spinner-border spinner-border-sm text-primary" role="status" aria-hidden="true"></span>
-      <span class="processing-filename">%text%</span>
-    </div>
-    <div class="progress w-50" style="height: 20px;">
-      <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: %progress%%; font-weight: bold;" aria-valuenow="%progress%" aria-valuemin="0" aria-valuemax="100">
-        %progress%%
+<template id="item-processing-template">
+  <tr>
+    <td class="align-middle">
+      <div class="d-flex align-items-center gap-2">
+        <span class="spinner-border spinner-border-sm text-primary" role="status" aria-hidden="true"></span>
+        <span class="processing-filename">%text%</span>
       </div>
-    </div>
-  </li>
-</div>
+    </td>
+    <td class="align-middle">
+      <div class="d-flex align-items-center gap-2">
+        <div class="progress w-100" style="height: 20px;">
+          <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: %progress%%; font-weight: bold;" aria-valuenow="%progress%" aria-valuemin="0" aria-valuemax="100">
+            %progress%%
+          </div>
+        </div>
+      </div>
+    </td>
+  </tr>
+</template>
 
 <script src="static/script.js"></script>
 <link href="https://cdn.jsdelivr.net/gh/tofsjonas/sortable@latest/dist/sortable.min.css" rel="stylesheet" />

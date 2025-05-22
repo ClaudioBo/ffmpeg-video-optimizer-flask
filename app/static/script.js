@@ -1,5 +1,3 @@
-const evtSource = new EventSource("/events");
-
 // Diccionario: filename → uuid
 const filenameUUIDMap = {};
 // Diccionario: uuid → DOM element
@@ -7,7 +5,6 @@ const processingItems = {};
 
 // Función para generar un UUID v4 básico
 function generateUUID() {
-    // Genera un UUID v4 "a mano"
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
         const r = Math.random() * 16 | 0;
         const v = c === 'x' ? r : (r & 0x3 | 0x8);
@@ -15,13 +12,15 @@ function generateUUID() {
     });
 }
 
+// Conectarse al SSE
+const evtSource = new EventSource("/events");
 evtSource.onmessage = function(event) {
     const msg = JSON.parse(event.data);
 
     if (msg.type === "reload") {
         location.reload();
     } else if (msg.type === "status") {
-        const list = document.getElementById("processing-list");
+        const table = document.getElementById("processing-list");
 
         const activeUUIDs = new Set();
 
@@ -39,7 +38,7 @@ evtSource.onmessage = function(event) {
 
             if (!processingItems[uuid]) {
                 // Crear nuevo item
-                const template = document.getElementById("item-processing-template");
+                const template = document.getElementById("item-processing-template").content;
                 const newItem = template.cloneNode(true);
                 newItem.id = `item-${uuid}`;
                 newItem.hidden = false;
@@ -50,7 +49,7 @@ evtSource.onmessage = function(event) {
                 progressBar.setAttribute("aria-valuenow", progress);
                 progressBar.textContent = progress + "%";
 
-                list.appendChild(newItem);
+                table.appendChild(newItem);
                 processingItems[uuid] = newItem;
             } else {
                 // Solo actualizar
