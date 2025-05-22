@@ -25,35 +25,35 @@ class VideoHandler(FileSystemEventHandler):
             if is_video_file(path):
                 task_queue.put(path)
 
-def start_video_worker():
+def start_video_worker(stop_event):
     """Inicia el worker que toma archivos de la cola y lanza tareas en el executor."""
     def worker_loop():
-        while True:
+        while not stop_event.is_set():
             path = task_queue.get()
             if path is None:
                 break
             executor.submit(process_video, path)
             time.sleep(0.1)
 
-    thread = Thread(target=worker_loop, daemon=True)
+    thread = Thread(target=worker_loop, args=(stop_event,), daemon=True)
     thread.start()
     return thread
 
-def start_disk_worker():
+def start_disk_worker(stop_event):
     """Inicia el worker que envia constantemente por SSE el espacio usado en disco."""
     def worker_loop():
         path = WATCH_DIR.resolve()
         while not os.path.ismount(path):
             path = path.parent
         mount_point = path
-        while True:
+        while not stop_event.is_set():
             time.sleep(1)
             if len(video_being_processed) == 0:
                 continue
             total, used, _ = shutil.disk_usage(mount_point)
             notify_disk(used, total)
 
-    thread = Thread(target=worker_loop, daemon=True)
+    thread = Thread(target=worker_loop, args=(stop_event,), daemon=True)
     thread.start()
     return thread
 
