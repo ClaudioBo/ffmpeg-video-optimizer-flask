@@ -27,7 +27,7 @@ class VideoHandler(FileSystemEventHandler):
 
 def start_video_worker(stop_event):
     """Inicia el worker que toma archivos de la cola y lanza tareas en el executor."""
-    def worker_loop():
+    def worker_loop(stop_event):
         while not stop_event.is_set():
             path = task_queue.get()
             if path is None:
@@ -41,7 +41,7 @@ def start_video_worker(stop_event):
 
 def start_disk_worker(stop_event):
     """Inicia el worker que envia constantemente por SSE el espacio usado en disco."""
-    def worker_loop():
+    def worker_loop(stop_event):
         path = WATCH_DIR.resolve()
         while not os.path.ismount(path):
             path = path.parent
