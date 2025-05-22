@@ -18,6 +18,8 @@ Agregar esto hasta el final y guardar
 ```sh
 # previamente tener montado el disco en /mnt/media (o cambia la ruta como quieras, idk)
 sudo mkdir /mnt/media/optimizador
+sudo mkdir /mnt/media/optimizador/entrada
+sudo mkdir /mnt/media/optimizador/salida
 sudo chown -R nobody:nogroup /mnt/media/optimizador
 sudo chmod -R 0775 /mnt/media/optimizador
 sudo service smbd restart
