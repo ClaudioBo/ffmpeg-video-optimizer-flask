@@ -1,5 +1,5 @@
 from core.database import init_db
-from core.watcher import start_disk_worker, start_observer, start_video_worker
+from core.watcher import start_disk_worker, start_observer, start_video_worker, executor
 from app import create_app
 import threading
 import time
@@ -21,6 +21,7 @@ def main():
     except KeyboardInterrupt:
         print("\nCTRL+C detectado! Deteniendo...")
         stop_event.set()
+        executor.shutdown(wait=False)
 
         observer_thread.stop()
         observer_thread.join()
