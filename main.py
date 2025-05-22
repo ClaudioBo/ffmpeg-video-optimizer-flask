@@ -21,7 +21,6 @@ def main():
     except KeyboardInterrupt:
         print("\nCTRL+C detectado! Deteniendo...")
         stop_event.set()
-        executor.shutdown(wait=False)
 
         observer_thread.stop()
         observer_thread.join()
