@@ -1,7 +1,11 @@
 # Hacer passthrough de la iGPU de AMD Ryzen al contenedor LXC
 Se tendra que configurar Proxmox para que este disponible la grafica a nivel host de Proxmox, y poderla "passthroughear" a uno o varios contenedores LXC.  
-Esta guia es para mi **`Beelink SER5 MAX`** que tiene una **`AMD Ryzen 7 5800H`**  
-Esta guia esta completamente untested ya que es un recopilatorio sacado de millones de comandos innecesarios que puse :)  
+
+> [!WARNING]
+> Esta guia esta completamente untested ya que es un recopilatorio sacado de millones de comandos innecesarios que puse :)  
+
+> [!NOTE]
+> Esta guia es para mi **`Beelink SER5 MAX`** que tiene una **`AMD Ryzen 7 5800H`**  
 
 ## Configurar BIOS para habilitar la iGPU para Proxmox
 1. Meterse a la BIOS

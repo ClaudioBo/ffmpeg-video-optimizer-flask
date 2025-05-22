@@ -2,6 +2,9 @@
 Servicio que optimizará con FFMPEG videos con subidos en la ruta definida **`'WATCH_DIR'`** y los dejara en **`'OUTPUT_DIR'`** y mostrara estadisticas y datos a tiempo real en una pagina expuesta bajo Flask.  
 Este servicio lo hice para usarlo en un **contenedor LXC** en mi **Proxmox** configurandole a que exponga un directorio bajo Samba para poder subir ahi los archivos desde mi computadora Windows.  
 
+> [!NOTE]
+> Los ajustes de ffmpeg pudieran ser diferentes pero son los que a mi me funcionaron mejor, sin sacrificar tanta calidad y reduciendo uso en disco.  
+
 ## Requisitos
 - [Hacer un contenedor LXC en Proxmox](docs/LXC.md)
 - [Hacerle passthrough](docs/PASSTHROUGH.md) de una iGPU de AMD Ryzen (ya que **`ffmpeg`** esta configurado que use **`vaapi`**) al **contenedor LXC**
