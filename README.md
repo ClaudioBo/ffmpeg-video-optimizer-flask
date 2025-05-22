@@ -5,6 +5,8 @@ Este servicio lo hice para usarlo en un **contenedor LXC** en mi **Proxmox** con
 > [!NOTE]
 > Los ajustes de ffmpeg pudieran ser diferentes pero son los que a mi me funcionaron mejor, sin sacrificar tanta calidad y reduciendo uso en disco.  
 
+![Imagen](/docs/img.png)
+
 ## Requisitos
 - [Hacer un contenedor LXC en Proxmox](docs/LXC.md)
 - [Hacerle passthrough](docs/PASSTHROUGH.md) de una iGPU de AMD Ryzen (ya que **`ffmpeg`** esta configurado que use **`vaapi`**) al **contenedor LXC**
