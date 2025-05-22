@@ -72,7 +72,8 @@ evtSource.onmessage = function (event) {
             if (!processingItems[uuid]) {
                 // Crear nuevo item
                 const template = document.getElementById("item-processing-template").content;
-                const newItem = template.cloneNode(true);
+                const fragment = template.cloneNode(true);
+                const newItem = fragment.querySelector("tr");
                 newItem.id = `item-${uuid}`;
                 newItem.hidden = false;
 
