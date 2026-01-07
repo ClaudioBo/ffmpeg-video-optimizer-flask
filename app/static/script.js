@@ -2,6 +2,8 @@
 const filenameUUIDMap = {};
 // Diccionario: uuid → DOM element
 const processingItems = {};
+// Progreso para calcular ETAs
+const progressStats = {}; 
 
 // Función para generar un UUID v4 básico
 function generateUUID() {
@@ -69,6 +71,39 @@ evtSource.onmessage = function (event) {
             const uuid = filenameUUIDMap[filename];
             activeUUIDs.add(uuid);
 
+            const now = Date.now();
+
+            if (!progressStats[uuid]) {
+                progressStats[uuid] = {
+                    lastProgress: progress,
+                    lastTime: now,
+                    speed: null
+                };
+            } else {
+                const stat = progressStats[uuid];
+                const deltaProgress = progress - stat.lastProgress;
+                const deltaTime = (now - stat.lastTime) / 1000;
+
+                if (deltaProgress > 0 && deltaTime > 0) {
+                    stat.speed = deltaProgress / deltaTime;
+                }
+
+                stat.lastProgress = progress;
+                stat.lastTime = now;
+            }
+
+            let etaText = "Calculando…";
+
+            const speed = progressStats[uuid].speed;
+            if (speed && speed > 0) {
+                const remaining = 100 - progress;
+                const etaSeconds = remaining / speed;
+
+                const mins = Math.floor(etaSeconds / 60);
+                const secs = Math.floor(etaSeconds % 60);
+                etaText = `${mins}m ${secs}s restantes`;
+            }
+
             if (!processingItems[uuid]) {
                 // Crear nuevo item
                 const template = document.getElementById("item-processing-template").content;
@@ -82,6 +117,7 @@ evtSource.onmessage = function (event) {
                 progressBar.style.width = progress + "%";
                 progressBar.setAttribute("aria-valuenow", progress);
                 progressBar.textContent = progress + "%";
+                newItem.querySelector(".eta-text").textContent = etaText;
 
                 table.appendChild(newItem);
                 processingItems[uuid] = newItem;
@@ -93,6 +129,7 @@ evtSource.onmessage = function (event) {
                 progressBar.style.width = progress + "%";
                 progressBar.setAttribute("aria-valuenow", progress);
                 progressBar.textContent = progress + "%";
+                item.querySelector(".eta-text").textContent = etaText;
             }
         });
 
