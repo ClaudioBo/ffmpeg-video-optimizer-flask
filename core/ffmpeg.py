@@ -100,7 +100,7 @@ def process_video(input_path: Path):
                     stderr_buffer.write(line)
                     seconds = parse_ffmpeg_time(line)
                     if seconds is not None:
-                        progress = min(100, (seconds / duration) * 100, 1)
+                        progress = min(100, (seconds / duration) * 100)
                         update_progress(input_path.name, progress)
 
                     if tmp_output_path.exists():
