@@ -74,23 +74,16 @@ def process_video(input_path: Path):
             stderr_buffer = io.StringIO()
             cmd = [
                 "ffmpeg", "-y",
-                "-hwaccel", "vaapi",
-                "-hwaccel_output_format", "vaapi",
-                "-vaapi_device", "/dev/dri/renderD128",
                 "-i", str(input_path),
 
-                "-vf", "scale_vaapi=w=iw:h=ih:format=nv12",
+                "-c:v", "libx265",
+                "-preset", "slow",
+                "-crf", "24",
 
-                "-c:v", "hevc_vaapi",
+                "-pix_fmt", "yuv420p",
                 "-profile:v", "main",
 
-                "-bf", "0",
-                "-g", "120",
-                "-rc", "vbr",
-
-                "-b:v", "4.5M",
-                "-maxrate", "6M",
-                "-bufsize", "12M",
+                "-x265-params", "aq-mode=3:aq-strength=1.0",
 
                 "-c:a", "copy",
                 "-f", "mp4",
