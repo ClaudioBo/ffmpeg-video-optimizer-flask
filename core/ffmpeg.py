@@ -9,7 +9,8 @@ from .config import OUTPUT_DIR, WATCH_DIR
 from .database import log_optimization
 from app.events import update_progress, notifY_reload, notify_progress
 
-from .singletons import video_being_processed, video_being_processed_lock
+from .singletons import video_being_processed, video_being_processed_lock, use_hevc
+import subprocess
 
 ffmpeg_time_re = re.compile(r'time=(\d+):(\d+):([\d.]+)')
 
@@ -72,14 +73,19 @@ def process_video(input_path: Path):
 
             stderr_buffer = io.StringIO()
             cmd = [
-                'ffmpeg', '-y',
-                '-hwaccel', 'vaapi', '-vaapi_device', '/dev/dri/renderD128',
-                '-i', str(input_path),
-                '-vf', 'format=nv12,hwupload',
-                '-c:v', 'h264_vaapi', '-bf', '2', '-g', '120',
-                '-rc', 'vbr', '-b:v', '0', '-preset', 'fast', '-qp', '29',
-                '-c:a', 'copy',
-                '-f', 'mp4',
+                "ffmpeg", "-y",
+                "-hwaccel", "vaapi",
+                "-hwaccel_output_format", "vaapi",
+                "-vaapi_device", "/dev/dri/renderD128",
+                "-i", str(input_path),
+                "-vf", "scale_vaapi=w=iw:h=ih:format=nv12",
+                "-c:v", "hevc_vaapi" if use_hevc else "h264_vaapi",
+                "-profile:v", "main" if use_hevc else "high",
+                "-bf", "0",
+                "-g", "120",
+                "-qp", "28",
+                "-c:a", "copy",
+                "-f", "mp4",
                 str(tmp_output_path),
             ]
 

@@ -115,8 +115,8 @@ evtSource.onmessage = function (event) {
                 newItem.querySelector(".processing-filename").textContent = filename;
                 const progressBar = newItem.querySelector(".progress-bar");
                 progressBar.style.width = progress + "%";
-                progressBar.setAttribute("aria-valuenow", progress);
-                progressBar.textContent = progress + "%";
+                progressBar.setAttribute("aria-valuenow", progress.toFixed(2));
+                progressBar.textContent = progress.toFixed(2) + "%";
                 newItem.querySelector(".eta-text").textContent = etaText;
 
                 table.appendChild(newItem);
@@ -127,8 +127,8 @@ evtSource.onmessage = function (event) {
                 item.querySelector(".processing-filename").textContent = filename;
                 const progressBar = item.querySelector(".progress-bar");
                 progressBar.style.width = progress + "%";
-                progressBar.setAttribute("aria-valuenow", progress);
-                progressBar.textContent = progress + "%";
+                progressBar.setAttribute("aria-valuenow", progress.toFixed(2));
+                progressBar.textContent = progress.toFixed(2) + "%";
                 item.querySelector(".eta-text").textContent = etaText;
             }
         });
