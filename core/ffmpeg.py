@@ -79,11 +79,18 @@ def process_video(input_path: Path):
                 "-vaapi_device", "/dev/dri/renderD128",
                 "-i", str(input_path),
                 "-vf", "scale_vaapi=w=iw:h=ih:format=nv12",
+
                 "-c:v", "hevc_vaapi" if use_hevc else "h264_vaapi",
                 "-profile:v", "main" if use_hevc else "high",
+
                 "-bf", "0",
                 "-g", "120",
-                "-qp", "28",
+                "-rc", "vbr",
+
+                "-b:v", "6M" if use_hevc else "9M",
+                "-maxrate", "9M" if use_hevc else "13M",
+                "-bufsize", "18M" if use_hevc else "26M",
+
                 "-c:a", "copy",
                 "-f", "mp4",
                 str(tmp_output_path),
