@@ -5,9 +5,9 @@ video_being_processed = {}
 video_being_processed_lock = Lock()
 sse_clients = []
 
-use_hevc = False
+is_amd = False
 try:
-    out = subprocess.check_output(["vainfo"], stderr=subprocess.STDOUT, text=True)
-    use_hevc = "VAProfileHEVCMain" in out
+    vainfo = subprocess.check_output(["vainfo"], stderr=subprocess.STDOUT, text=True)
+    is_amd = "Gallium" in vainfo or "Radeon" in vainfo
 except Exception:
     pass

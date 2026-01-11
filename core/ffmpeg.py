@@ -9,7 +9,7 @@ from .config import OUTPUT_DIR, WATCH_DIR
 from .database import log_optimization
 from app.events import update_progress, notify_reload, notify_progress
 
-from .singletons import video_being_processed, video_being_processed_lock, use_hevc
+from .singletons import video_being_processed, video_being_processed_lock, is_amd
 import subprocess
 
 ffmpeg_time_re = re.compile(r'time=(\d+):(\d+):([\d.]+)')
@@ -72,28 +72,37 @@ def process_video(input_path: Path):
                 return
 
             stderr_buffer = io.StringIO()
+            if is_amd:
+                # AMD VAAPI HEVC — CQP only
+                video_args = [
+                    "-c:v", "hevc_vaapi",
+                    "-profile:v", "main",
+                    "-bf", "0",
+                    "-g", "120",
+                    "-rc", "cqp",
+                    "-qp", "28",
+                ]
+            else:
+                # Intel VAAPI HEVC — VBR supported
+                video_args = [
+                    "-c:v", "hevc_vaapi",
+                    "-profile:v", "main",
+                    "-bf", "0",
+                    "-g", "120",
+                    "-rc", "vbr",
+                    "-b:v", "4.5M",
+                    "-maxrate", "6M",
+                    "-bufsize", "12M",
+                ]
+
             cmd = [
                 "ffmpeg", "-y",
                 "-hwaccel", "vaapi",
                 "-hwaccel_output_format", "vaapi",
                 "-vaapi_device", "/dev/dri/renderD128",
                 "-i", str(input_path),
-
                 "-vf", "scale_vaapi=w=iw:h=ih:format=nv12",
-
-                # Prefer HEVC; fall back to H.264 only if needed
-                "-c:v", "hevc_vaapi" if use_hevc else "h264_vaapi",
-                "-profile:v", "main" if use_hevc else "high",
-
-                "-bf", "0",          # stability across AMD/Intel
-                "-g", "120",
-                "-rc", "vbr",
-
-                # Tuned below NVIDIA Overlay source bitrate
-                "-b:v", "4.5M" if use_hevc else "6.5M",
-                "-maxrate", "6M" if use_hevc else "8M",
-                "-bufsize", "12M" if use_hevc else "16M",
-
+                *video_args,
                 "-c:a", "copy",
                 "-f", "mp4",
                 str(tmp_output_path),
