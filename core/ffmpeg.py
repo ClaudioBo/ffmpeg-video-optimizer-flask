@@ -87,12 +87,10 @@ def process_video(input_path: Path):
                 video_args = [
                     "-c:v", "hevc_vaapi",
                     "-profile:v", "main",
-                    "-bf", "0",
+                    "-bf", "2",
                     "-g", "120",
                     "-rc", "vbr",
-                    "-b:v", "4.5M",
-                    "-maxrate", "6M",
-                    "-bufsize", "12M",
+                    "-b:v", "5M",
                 ]
 
             cmd = [
