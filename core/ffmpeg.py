@@ -7,7 +7,7 @@ from pathlib import Path
 
 from .config import OUTPUT_DIR, WATCH_DIR
 from .database import log_optimization
-from app.events import update_progress, notifY_reload, notify_progress
+from app.events import update_progress, notify_reload, notify_progress
 
 from .singletons import video_being_processed, video_being_processed_lock, use_hevc
 import subprocess
@@ -172,4 +172,39 @@ def process_video(input_path: Path):
     finally:
         with video_being_processed_lock:
             video_being_processed.pop(input_path.name, None)
-        notifY_reload()
+        notify_reload()
+
+def clear_originals():
+    """
+    Delete original videos from WATCH_DIR that have already been processed
+    (either optimized or marked as failed).
+    """
+    with video_being_processed_lock:
+        currently_processing = set(video_being_processed.keys())
+
+    for input_path in WATCH_DIR.rglob("*"):
+        if not input_path.is_file():
+            continue
+
+        # Skip files currently being processed
+        if input_path.name in currently_processing:
+            continue
+
+        try:
+            output_path, failed_path, _ = get_output_paths(input_path)
+
+            optimized_exists = output_path.exists() or output_path.with_name(
+                output_path.stem + "_optimized" + output_path.suffix
+            ).exists()
+
+            failed_exists = failed_path.exists()
+
+            if optimized_exists or failed_exists:
+                try:
+                    input_path.unlink()
+                    print(f"[ELIMINADO] Original borrado: {input_path.relative_to(WATCH_DIR)}")
+                except Exception as e:
+                    print(f"[ERROR] No se pudo borrar {input_path}: {e}")
+
+        except Exception:
+            traceback.print_exc()

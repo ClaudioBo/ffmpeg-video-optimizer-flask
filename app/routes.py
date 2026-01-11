@@ -8,6 +8,7 @@ from core.config import WATCH_DIR
 from core.database import clear_optimizations, get_optimizations
 from core.utils import get_color, human_readable_size
 from core.watcher import queue_all_videos
+from core.ffmpeg import clear_originals
 from core.singletons import video_being_processed, video_being_processed_lock, sse_clients
 
 
@@ -61,6 +62,12 @@ def manual_scan():
 def delete_stats():
     print("Eliminando estadísticas...")
     clear_optimizations()
+    return redirect(url_for('routes.index'))
+
+@routes.route("/delete_originals", methods=['POST'])
+def delete_originals():
+    print("Eliminando videos originales que ya hayan sido procesados...")
+    clear_originals()
     return redirect(url_for('routes.index'))
 
 @routes.route("/events")

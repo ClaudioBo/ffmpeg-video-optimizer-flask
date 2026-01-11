@@ -22,7 +22,7 @@ def notify_progress():
     for q in sse_clients:
         q.put(payload)
 
-def notifY_reload():
+def notify_reload():
     """Notifica a los clientes que deben recargar la interfaz."""
     payload = json.dumps({"type": "reload"})
     for q in sse_clients:
