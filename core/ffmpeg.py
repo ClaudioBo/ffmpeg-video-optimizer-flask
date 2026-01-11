@@ -74,15 +74,6 @@ def process_video(input_path: Path):
         orig_size = input_path.stat().st_size
         stderr_buffer = io.StringIO()
 
-        video_args = [
-            "-c:v", "hevc_vaapi",
-            "-profile:v", "main",
-            "-bf", "0",
-            "-g", "120",
-            "-rc", "cqp",
-            "-qp", "28",
-        ]
-
         cmd = [
             "ffmpeg", "-y",
             "-hwaccel", "vaapi",
@@ -90,7 +81,14 @@ def process_video(input_path: Path):
             "-vaapi_device", "/dev/dri/renderD128",
             "-i", str(input_path),
             "-vf", "scale_vaapi=w=iw:h=ih:format=nv12",
-            *video_args,
+            "-c:v", "hevc_vaapi",
+            "-profile:v", "main",    # safe HEVC profile across Intel/AMD
+            "-bf", "2",              # B-frames for compression efficiency
+            "-g", "120",             # GOP length, adjustable for streaming/latency
+            "-rc", "vbr",            # Variable bitrate for controlled filesize
+            "-b:v", "0",             # Allow bitrate to fluctuate as needed
+            "-qp", "28",             # Target quality
+            "-preset", "fast",       # balance speed/compression
             "-c:a", "copy",
             "-f", "mp4",
             str(tmp_output_path),
