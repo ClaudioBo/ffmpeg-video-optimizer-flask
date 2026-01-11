@@ -74,16 +74,25 @@ def process_video(input_path: Path):
             stderr_buffer = io.StringIO()
             cmd = [
                 "ffmpeg", "-y",
+                "-hwaccel", "vaapi",
+                "-hwaccel_output_format", "vaapi",
+                "-vaapi_device", "/dev/dri/renderD128",
                 "-i", str(input_path),
 
-                "-c:v", "libx265",
-                "-preset", "slow",
-                "-crf", "24",
+                "-vf", "scale_vaapi=w=iw:h=ih:format=nv12",
 
-                "-pix_fmt", "yuv420p",
-                "-profile:v", "main",
+                # Prefer HEVC; fall back to H.264 only if needed
+                "-c:v", "hevc_vaapi" if use_hevc else "h264_vaapi",
+                "-profile:v", "main" if use_hevc else "high",
 
-                "-x265-params", "aq-mode=3:aq-strength=1.0",
+                "-bf", "0",          # stability across AMD/Intel
+                "-g", "120",
+                "-rc", "vbr",
+
+                # Tuned below NVIDIA Overlay source bitrate
+                "-b:v", "4.5M" if use_hevc else "6.5M",
+                "-maxrate", "6M" if use_hevc else "8M",
+                "-bufsize", "12M" if use_hevc else "16M",
 
                 "-c:a", "copy",
                 "-f", "mp4",
