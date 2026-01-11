@@ -9,7 +9,7 @@ from .config import OUTPUT_DIR, WATCH_DIR
 from .database import log_optimization
 from app.events import update_progress, notify_reload, notify_progress
 
-from .singletons import video_being_processed, video_being_processed_lock, is_amd_gpu
+from .singletons import video_being_processed, video_being_processed_lock
 import subprocess
 
 ffmpeg_time_re = re.compile(r'time=(\d+):(\d+):([\d.]+)')
@@ -72,26 +72,14 @@ def process_video(input_path: Path):
                 return
 
             stderr_buffer = io.StringIO()
-            if is_amd_gpu():
-                # AMD VAAPI HEVC — CQP only
-                video_args = [
-                    "-c:v", "hevc_vaapi",
-                    "-profile:v", "main",
-                    "-bf", "0",
-                    "-g", "120",
-                    "-rc", "cqp",
-                    "-qp", "28",
-                ]
-            else:
-                # Intel VAAPI HEVC — VBR supported
-                video_args = [
-                    "-c:v", "hevc_vaapi",
-                    "-profile:v", "main",
-                    "-bf", "2",
-                    "-g", "120",
-                    "-rc", "vbr",
-                    "-b:v", "5M",
-                ]
+            video_args = [
+                "-c:v", "hevc_vaapi",
+                "-profile:v", "main",
+                "-bf", "0",
+                "-g", "120",
+                "-rc", "cqp",
+                "-qp", "28",
+            ]
 
             cmd = [
                 "ffmpeg", "-y",
