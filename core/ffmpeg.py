@@ -76,21 +76,29 @@ def process_video(input_path: Path):
 
         cmd = [
             "ffmpeg", "-y",
-            "-hwaccel", "vaapi",
-            "-hwaccel_output_format", "vaapi",
-            "-vaapi_device", "/dev/dri/renderD128",
+
+            # Do NOT force VAAPI decode
             "-i", str(input_path),
-            "-vf", "scale_vaapi=w=iw:h=ih:format=nv12",
+
+            # Software scale (downscale-only) → NV12 → upload once
+            "-vf", "scale=w=1920:h=1080:force_original_aspect_ratio=decrease:flags=lanczos,format=nv12,hwupload",
+
+            # Initialize VAAPI only for encoding
+            "-init_hw_device", "vaapi=va:/dev/dri/renderD128",
+            "-filter_hw_device", "va",
+
             "-c:v", "hevc_vaapi",
-            "-profile:v", "main",    # safe HEVC profile across Intel/AMD
-            "-bf", "2",              # B-frames for compression efficiency
-            "-g", "120",             # GOP length, adjustable for streaming/latency
-            "-rc", "vbr",            # Variable bitrate for controlled filesize
-            "-b:v", "0",             # Allow bitrate to fluctuate as needed
-            "-qp", "28",             # Target quality
-            "-preset", "fast",       # balance speed/compression
+            "-profile:v", "main",
+            "-rc", "vbr",
+            "-b:v", "0",
+            "-qp", "24",
+            "-bf", "2",
+            "-g", "60",
+            "-preset", "fast",
+
             "-c:a", "copy",
             "-f", "mp4",
+
             str(tmp_output_path),
         ]
 
